@@ -54,6 +54,8 @@
 
 ### Gabarit 1 : Import d'une Espèce d'Oiseau (`birds.json`)
 
+> 📸 **Note importante concernant les images :** Il est recommandé d'utiliser des liens d'images **libres de droit** hébergées sur des plateformes ouvertes comme **Wikimedia Commons** ou **Wikipédia** (ex: `https://upload.wikimedia.org/...`).
+
 ```json
 [
   {
@@ -71,7 +73,7 @@
     "description": "Passereau massif au bec triangulaire extrêmement puissant capable d'écraser des noyaux de cerises.",
     "diet": "Granivore & graines dures",
     "similar_species": ["chardonneret-elegant"],
-    "image": "assets/images/birds/grosbec.webp"
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Erithacus_rubecula_with_cocked_head.jpg/800px-Erithacus_rubecula_with_cocked_head.jpg"
   }
 ]
 ```

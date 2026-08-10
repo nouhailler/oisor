@@ -38,7 +38,7 @@ const SAMPLE_SPECIES_JSON = [
     description: "Passereau massif au bec triangulaire extrêmement puissant capable d'écraser des noyaux de cerises.",
     diet: "Granivore & graines dures",
     similar_species: ["chardonneret-elegant"],
-    image: "assets/images/birds/grosbec.webp"
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Erithacus_rubecula_with_cocked_head.jpg/800px-Erithacus_rubecula_with_cocked_head.jpg"
   }
 ];
 
@@ -274,16 +274,27 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               </h4>
 
               {activeMode === 'species' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
-                  <div><strong className="text-white">id :</strong> Identifiant unique (kebab-case)</div>
-                  <div><strong className="text-white">name_common :</strong> Nom francais de l'oiseau</div>
-                  <div><strong className="text-white">name_latin :</strong> Nom scientifique latin</div>
-                  <div><strong className="text-white">family :</strong> Famille (ex: Paridae, Corvidae)</div>
-                  <div><strong className="text-white">habitat :</strong> Liste des milieux (Jardins, Forêts...)</div>
-                  <div><strong className="text-white">size_category :</strong> très-petit, petit, moyen, grand, très-grand</div>
-                  <div><strong className="text-white">beak_type :</strong> court-fin, conique, crochu, long, plat</div>
-                  <div><strong className="text-white">main_colors :</strong> Pastilles de couleur (orange, bleu, etc.)</div>
-                </div>
+                <>
+                  <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 flex items-start space-x-3 text-xs text-amber-200 col-span-1 sm:col-span-2 mb-1">
+                    <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-amber-300 font-bold block mb-0.5">📸 Recommandation pour les images d'espèces :</strong>
+                      Veuillez utiliser des liens d'images <strong>libres de droit</strong> provenant idéalement de <strong>Wikimedia Commons</strong> ou <strong>Wikipédia</strong> (ex : liens <code className="text-amber-100 bg-amber-900/60 px-1 py-0.5 rounded font-mono">https://upload.wikimedia.org/...</code>).
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 col-span-1 sm:col-span-2">
+                    <div><strong className="text-white">id :</strong> Identifiant unique (kebab-case)</div>
+                    <div><strong className="text-white">name_common :</strong> Nom français de l'oiseau</div>
+                    <div><strong className="text-white">name_latin :</strong> Nom scientifique latin</div>
+                    <div><strong className="text-white">family :</strong> Famille (ex: Paridae, Corvidae)</div>
+                    <div><strong className="text-white">habitat :</strong> Liste des milieux (Jardins, Forêts...)</div>
+                    <div><strong className="text-white">size_category :</strong> très-petit, petit, moyen, grand, très-grand</div>
+                    <div><strong className="text-white">beak_type :</strong> court-fin, conique, crochu, long, plat</div>
+                    <div><strong className="text-white">main_colors :</strong> Pastilles de couleur (orange, bleu, etc.)</div>
+                    <div className="sm:col-span-2"><strong className="text-white">image :</strong> Lien URL HTTPS d'image <strong>libre de droit (Wikimedia Commons, Wikipédia)</strong> ou chemin local.</div>
+                  </div>
+                </>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
                   <div><strong className="text-white">id :</strong> Identifiant unique de l'observation</div>
