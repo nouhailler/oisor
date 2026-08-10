@@ -1,0 +1,25 @@
+{
+  "name": "Oiseaux de France - Guide & Identification",
+  "short_name": "Oiseaux de France",
+  "description": "Progressive Web App d'inventaire, d'identification et carnet d'observations des oiseaux de France métropolitaine, 100% hors-ligne.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#0d9488",
+  "categories": ["nature", "education", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
