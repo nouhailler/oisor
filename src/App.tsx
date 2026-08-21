@@ -71,7 +71,7 @@ export const App: React.FC = () => {
         onOpenImportModal={() => setIsImportModalOpen(true)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 mb-16 md:mb-0">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 mb-20 md:mb-0">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <div className="w-12 h-12 rounded-full border-4 border-teal-500/30 border-t-teal-400 animate-spin" />
@@ -153,7 +153,7 @@ export const App: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="bg-slate-900/60 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400">
+      <footer className="bg-slate-900/60 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400 mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2 text-slate-300 font-semibold">
             <Feather className="w-4 h-4 text-teal-400" />

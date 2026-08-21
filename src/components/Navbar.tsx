@@ -162,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 px-1 py-1.5 flex justify-around items-center">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 px-1 py-1.5 pb-safe flex justify-around items-center shadow-2xl">
         <button
           onClick={() => setActiveTab('wizard')}
           className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all ${
