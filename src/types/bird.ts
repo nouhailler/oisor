@@ -2,6 +2,24 @@ export type SizeCategory = 'très-petit' | 'petit' | 'moyen' | 'grand' | 'très-
 export type BeakType = 'court-fin' | 'conique' | 'crochu' | 'long' | 'plat';
 export type SeasonType = 'toute-annee' | 'printemps-ete' | 'hiver' | 'migration';
 
+export const REGIONS_FRANCE = [
+  'Auvergne-Rhône-Alpes',
+  'Bretagne',
+  'Île-de-France',
+  'Bourgogne-Franche-Comté',
+  'Centre-Val de Loire',
+  'Corse',
+  'Grand Est',
+  'Hauts-de-France',
+  'Normandie',
+  'Nouvelle-Aquitaine',
+  'Occitanie',
+  'Pays de la Loire',
+  'Provence-Alpes-Côte d\'Azur',
+] as const;
+
+export type RegionName = (typeof REGIONS_FRANCE)[number];
+
 export interface Bird {
   id: string;
   name_common: string;
@@ -18,6 +36,7 @@ export interface Bird {
   diet: string;
   similar_species: string[];
   image: string;
+  regions?: string[];
 }
 
 export interface IdentificationFilters {
@@ -25,6 +44,7 @@ export interface IdentificationFilters {
   colors: string[];
   beak_type: BeakType | null;
   habitat: string | null;
+  region?: string | null;
 }
 
 export interface Observation {
@@ -43,3 +63,4 @@ export interface Observation {
   notes?: string;
   created_at: number;
 }
+

@@ -23,7 +23,7 @@ export const BirdImage: React.FC<BirdImageProps> = ({
   // SVG Fallback representation with elegant colors based on bird name
   const getGradient = (birdName: string) => {
     const lower = birdName.toLowerCase();
-    if (lower.includes('rouge-gorge')) return 'from-amber-600 via-orange-500 to-amber-800';
+    if (lower.includes('rouge-gorge') || lower.includes('rougegorge')) return 'from-amber-600 via-orange-500 to-amber-800';
     if (lower.includes('mésange')) return 'from-sky-500 via-emerald-400 to-amber-400';
     if (lower.includes('merle')) return 'from-slate-800 via-zinc-900 to-amber-500';
     if (lower.includes('pigeon')) return 'from-slate-400 via-slate-600 to-purple-800';
@@ -31,8 +31,16 @@ export const BirdImage: React.FC<BirdImageProps> = ({
     if (lower.includes('martinet')) return 'from-slate-900 via-zinc-800 to-amber-900';
     if (lower.includes('héron')) return 'from-slate-400 via-sky-600 to-indigo-900';
     if (lower.includes('chardonneret')) return 'from-red-500 via-yellow-400 to-slate-900';
-    if (lower.includes('faucon')) return 'from-amber-700 via-yellow-700 to-stone-800';
+    if (lower.includes('faucon') || lower.includes('épervier')) return 'from-amber-700 via-yellow-700 to-stone-800';
     if (lower.includes('canard')) return 'from-emerald-700 via-teal-800 to-amber-600';
+    if (lower.includes('aigle') || lower.includes('gypaète') || lower.includes('milan') || lower.includes('circaète')) return 'from-amber-800 via-yellow-900 to-stone-900';
+    if (lower.includes('tétras') || lower.includes('lagopède')) return 'from-stone-700 via-cyan-900 to-slate-900';
+    if (lower.includes('chocard')) return 'from-zinc-900 via-slate-800 to-yellow-600';
+    if (lower.includes('fou') || lower.includes('macareux') || lower.includes('goéland') || lower.includes('sterne')) return 'from-sky-600 via-teal-700 to-indigo-900';
+    if (lower.includes('cormoran') || lower.includes('huîtrier') || lower.includes('gravelot') || lower.includes('aigrette')) return 'from-slate-800 via-cyan-900 to-teal-900';
+    if (lower.includes('pic')) return 'from-emerald-700 via-red-600 to-zinc-900';
+    if (lower.includes('chouette')) return 'from-amber-900 via-stone-800 to-zinc-950';
+    if (lower.includes('pinson') || lower.includes('moineau')) return 'from-amber-700 via-orange-600 to-slate-800';
     return 'from-emerald-600 via-teal-700 to-slate-800';
   };
 

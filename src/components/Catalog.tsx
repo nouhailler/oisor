@@ -1,17 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { Bird } from '../types/bird';
+import { Bird, REGIONS_FRANCE } from '../types/bird';
 import { BirdImage } from './BirdImage';
-import { Search, Filter, SlidersHorizontal, ArrowUpDown, Eye, Grid, List } from 'lucide-react';
+import { Search, Filter, Eye, Grid, List, MapPin } from 'lucide-react';
 
 interface CatalogProps {
   birds: Bird[];
   onSelectBird: (bird: Bird) => void;
+  onSelectRegionTab?: (region: string) => void;
 }
 
-export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
+export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectRegionTab }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedHabitat, setSelectedHabitat] = useState<string>('all');
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'alpha' | 'alpha-reverse' | 'family'>('alpha');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -42,8 +44,10 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
 
         const matchesHabitat = selectedHabitat === 'all' || bird.habitat.includes(selectedHabitat);
         const matchesFamily = selectedFamily === 'all' || bird.family === selectedFamily;
+        const matchesRegion =
+          selectedRegion === 'all' || (bird.regions && bird.regions.includes(selectedRegion));
 
-        return matchesSearch && matchesHabitat && matchesFamily;
+        return matchesSearch && matchesHabitat && matchesFamily && matchesRegion;
       })
       .sort((a, b) => {
         if (sortBy === 'alpha') return a.name_common.localeCompare(b.name_common, 'fr');
@@ -51,7 +55,7 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
         if (sortBy === 'family') return a.family.localeCompare(b.family, 'fr');
         return 0;
       });
-  }, [birds, searchQuery, selectedHabitat, selectedFamily, sortBy]);
+  }, [birds, searchQuery, selectedHabitat, selectedFamily, selectedRegion, sortBy]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -65,7 +69,7 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher par nom commun, nom latin, famille..."
+              placeholder="Rechercher par nom commun, nom latin, région, famille..."
               className="w-full pl-12 pr-4 py-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-sm font-medium transition-all"
             />
             {searchQuery && (
@@ -129,6 +133,25 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
             <span>Filtres :</span>
           </div>
 
+          {/* Region Select */}
+          <select
+            value={selectedRegion}
+            onChange={(e) => setSelectedRegion(e.target.value)}
+            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-semibold text-teal-300 focus:outline-none focus:border-teal-500"
+          >
+            <option value="all">📍 Toutes les régions de France</option>
+            <option value="Auvergne-Rhône-Alpes">🏔️ Auvergne-Rhône-Alpes</option>
+            <option value="Bretagne">🌊 Bretagne</option>
+            <option value="Île-de-France">🏛️ Île-de-France</option>
+            {REGIONS_FRANCE.filter(
+              (r) => !['Auvergne-Rhône-Alpes', 'Bretagne', 'Île-de-France'].includes(r)
+            ).map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+
           {/* Habitat Select */}
           <select
             value={selectedHabitat}
@@ -157,11 +180,12 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
             ))}
           </select>
 
-          {(selectedHabitat !== 'all' || selectedFamily !== 'all' || searchQuery) && (
+          {(selectedHabitat !== 'all' || selectedFamily !== 'all' || selectedRegion !== 'all' || searchQuery) && (
             <button
               onClick={() => {
                 setSelectedHabitat('all');
                 setSelectedFamily('all');
+                setSelectedRegion('all');
                 setSearchQuery('');
               }}
               className="text-xs text-teal-400 hover:underline font-semibold ml-auto"
@@ -192,7 +216,16 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird }) => {
                 className="group bg-slate-900/80 border border-slate-800 hover:border-teal-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
               >
                 <div>
-                  <BirdImage src={bird.image} alt={bird.name_common} name={bird.name_common} className="w-full h-52 object-cover" />
+                  <div className="relative">
+                    <BirdImage src={bird.image} alt={bird.name_common} name={bird.name_common} className="w-full h-52 object-cover" />
+                    {bird.regions && bird.regions.length > 0 && (
+                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-slate-950/80 backdrop-blur-md text-teal-300 font-semibold text-[10px] border border-teal-500/30 shadow">
+                        {bird.regions.includes('Auvergne-Rhône-Alpes') && bird.regions.includes('Bretagne') && bird.regions.includes('Île-de-France')
+                          ? 'Toute la France'
+                          : `${bird.regions.length} rég.`}
+                      </div>
+                    )}
+                  </div>
 
                   <div className="p-5">
                     <div className="flex items-start justify-between">

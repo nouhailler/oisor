@@ -1,10 +1,10 @@
 import React from 'react';
-import { Feather, Compass, BookOpen, BookText, Download, Wifi, WifiOff, CheckCircle2, FileJson } from 'lucide-react';
+import { Feather, Compass, BookOpen, BookText, FileJson, Wifi, WifiOff, CheckCircle2, Download, MapPin } from 'lucide-react';
 import { useOnlineStatus, usePWAInstallPrompt } from '../services/pwaService';
 
 interface NavbarProps {
-  activeTab: 'wizard' | 'catalog' | 'notebook';
-  setActiveTab: (tab: 'wizard' | 'catalog' | 'notebook') => void;
+  activeTab: 'wizard' | 'catalog' | 'region' | 'notebook';
+  setActiveTab: (tab: 'wizard' | 'catalog' | 'region' | 'notebook') => void;
   observationCount: number;
   onOpenImportModal: () => void;
 }
@@ -36,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
           <nav className="hidden md:flex items-center space-x-1 bg-slate-950/60 p-1.5 rounded-2xl border border-slate-800/80">
             <button
               onClick={() => setActiveTab('wizard')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'wizard'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -48,26 +48,38 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
 
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'catalog'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span>Catalogue des Espèces</span>
+              <span>Catalogue</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('region')}
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+                activeTab === 'region'
+                  ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+              }`}
+            >
+              <MapPin className="w-4 h-4" />
+              <span>Par Région</span>
             </button>
 
             <button
               onClick={() => setActiveTab('notebook')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'notebook'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
               }`}
             >
               <BookText className="w-4 h-4" />
-              <span>Carnet d'Observations</span>
+              <span>Carnet</span>
               {observationCount > 0 && (
                 <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
                   activeTab === 'notebook' ? 'bg-slate-950 text-teal-300' : 'bg-teal-500/20 text-teal-300'
@@ -83,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
               title="Menu d'importation et documentation du Gabarit JSON"
             >
               <FileJson className="w-4 h-4 text-teal-400" />
-              <span className="hidden lg:inline">Gabarit JSON & Import</span>
+              <span className="hidden xl:inline">Import JSON</span>
             </button>
           </nav>
 
@@ -127,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-1.5 flex justify-around items-center">
         <button
           onClick={() => setActiveTab('wizard')}
-          className={`flex flex-col items-center py-1 px-3 rounded-xl text-xs transition-all ${
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
             activeTab === 'wizard' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
@@ -137,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
 
         <button
           onClick={() => setActiveTab('catalog')}
-          className={`flex flex-col items-center py-1 px-3 rounded-xl text-xs transition-all ${
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
             activeTab === 'catalog' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
@@ -146,8 +158,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
         </button>
 
         <button
+          onClick={() => setActiveTab('region')}
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
+            activeTab === 'region' ? 'text-teal-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <MapPin className="w-5 h-5 mb-0.5" />
+          <span>Par Région</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('notebook')}
-          className={`flex flex-col items-center py-1 px-3 rounded-xl text-xs transition-all relative ${
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all relative ${
             activeTab === 'notebook' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
@@ -164,12 +186,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
 
         <button
           onClick={onOpenImportModal}
-          className="flex flex-col items-center py-1 px-3 rounded-xl text-xs text-teal-400 font-semibold"
+          className="flex flex-col items-center py-1 px-2.5 rounded-xl text-xs text-teal-400 font-semibold"
         >
           <FileJson className="w-5 h-5 mb-0.5" />
-          <span>Import JSON</span>
+          <span>Import</span>
         </button>
       </div>
     </header>
   );
 };
+

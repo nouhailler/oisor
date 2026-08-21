@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { Observation } from '../types/bird';
+import { Bird, Observation } from '../types/bird';
 
 interface OiseauxDB extends DBSchema {
   observations: {
@@ -32,18 +32,109 @@ function getDB(): Promise<IDBPDatabase<OiseauxDB>> {
         }
       },
     }).catch((err) => {
-      console.warn('IndexedDB unavailable, fallback to localStorage', err);
+      console.warn('IndexedDB indisponible, activation du secours haute capacité (OPFS / Cache Storage API)', err);
       return null as unknown as IDBPDatabase<OiseauxDB>;
     });
   }
   return dbPromise;
 }
 
-// Fallback LocalStorage helpers
+// Keys & URNs for Secondary High-Capacity Fallback
+const CACHE_STORE_NAME = 'oiseaux_opfs_fallback_v1';
+const OBSERVATIONS_URI = 'https://local-oisor.internal/data/observations.json';
+const CUSTOM_BIRDS_URI = 'https://local-oisor.internal/data/custom_birds.json';
 const LOCAL_STORAGE_KEY = 'oiseaux_observations_backup';
 const LOCAL_STORAGE_BIRDS_KEY = 'oiseaux_custom_birds_backup';
 
-function getLocalStorageObservations(): Observation[] {
+// --- High-Capacity Secondary Storage Fallback Engine (OPFS & Web Cache API) ---
+// Note: Discards LocalStorage's 5MB quota limit in favor of GB origin storage!
+
+async function getOPFSDirectory(): Promise<FileSystemDirectoryHandle | null> {
+  if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
+    try {
+      return await navigator.storage.getDirectory();
+    } catch (e) {
+      console.warn('OPFS indisponible:', e);
+    }
+  }
+  return null;
+}
+
+async function saveOPFSFile(fileName: string, content: string): Promise<boolean> {
+  const root = await getOPFSDirectory();
+  if (root) {
+    try {
+      const fileHandle = await root.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      return true;
+    } catch (e) {
+      console.warn('OPFS write error:', e);
+    }
+  }
+  return false;
+}
+
+async function readOPFSFile(fileName: string): Promise<string | null> {
+  const root = await getOPFSDirectory();
+  if (root) {
+    try {
+      const fileHandle = await root.getFileHandle(fileName);
+      const file = await fileHandle.getFile();
+      return await file.text();
+    } catch (e) {
+      // File not found
+    }
+  }
+  return null;
+}
+
+async function saveCacheStorageData(uri: string, content: string): Promise<boolean> {
+  if ('caches' in window) {
+    try {
+      const cache = await caches.open(CACHE_STORE_NAME);
+      const response = new Response(content, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      await cache.put(uri, response);
+      return true;
+    } catch (e) {
+      console.warn('Cache Storage write error:', e);
+    }
+  }
+  return false;
+}
+
+async function readCacheStorageData(uri: string): Promise<string | null> {
+  if ('caches' in window) {
+    try {
+      const cache = await caches.open(CACHE_STORE_NAME);
+      const response = await cache.match(uri);
+      if (response) {
+        return await response.text();
+      }
+    } catch (e) {
+      console.warn('Cache Storage read error:', e);
+    }
+  }
+  return null;
+}
+
+async function getFallbackObservations(): Promise<Observation[]> {
+  // 1. Try OPFS
+  const opfs = await readOPFSFile('observations.json');
+  if (opfs) {
+    try { return JSON.parse(opfs); } catch {}
+  }
+
+  // 2. Try Web Cache Storage API
+  const cache = await readCacheStorageData(OBSERVATIONS_URI);
+  if (cache) {
+    try { return JSON.parse(cache); } catch {}
+  }
+
+  // 3. Legacy LocalStorage fallback
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -52,13 +143,21 @@ function getLocalStorageObservations(): Observation[] {
   }
 }
 
-function saveLocalStorageObservations(obs: Observation[]): void {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(obs));
-  } catch (e) {
-    console.error('LocalStorage write error', e);
+async function saveFallbackObservations(obsList: Observation[]): Promise<void> {
+  const json = JSON.stringify(obsList);
+  const opfsOk = await saveOPFSFile('observations.json', json);
+  const cacheOk = await saveCacheStorageData(OBSERVATIONS_URI, json);
+
+  if (!opfsOk && !cacheOk) {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, json);
+    } catch (e) {
+      console.warn('Erreur de quota LocalStorage en fallback:', e);
+    }
   }
 }
+
+// --- Public Observations API ---
 
 export async function getAllObservations(): Promise<Observation[]> {
   try {
@@ -68,24 +167,30 @@ export async function getAllObservations(): Promise<Observation[]> {
       return items.sort((a, b) => b.created_at - a.created_at);
     }
   } catch (e) {
-    console.warn('Error reading from IndexedDB:', e);
+    console.warn('Lecture IndexedDB échouée, bascule vers le stockage de secours Haute Capacité:', e);
   }
-  return getLocalStorageObservations().sort((a, b) => b.created_at - a.created_at);
+  const fallback = await getFallbackObservations();
+  return fallback.sort((a, b) => b.created_at - a.created_at);
 }
 
 export async function saveObservation(obs: Observation): Promise<Observation> {
+  let dbSuccess = false;
   try {
     const db = await getDB();
     if (db) {
       await db.put('observations', obs);
+      dbSuccess = true;
     }
   } catch (e) {
-    console.warn('IndexedDB write error, saving to localStorage:', e);
+    console.warn('Écriture IndexedDB échouée, secours OPFS / Cache Storage activé:', e);
   }
-  // Always update LocalStorage backup
-  const local = getLocalStorageObservations().filter((item) => item.id !== obs.id);
-  local.push(obs);
-  saveLocalStorageObservations(local);
+
+  // Synchronize high-capacity backup engine
+  const current = await getFallbackObservations();
+  const filtered = current.filter((item) => item.id !== obs.id);
+  filtered.push(obs);
+  await saveFallbackObservations(filtered);
+
   return obs;
 }
 
@@ -96,17 +201,21 @@ export async function deleteObservation(id: string): Promise<void> {
       await db.delete('observations', id);
     }
   } catch (e) {
-    console.warn('IndexedDB delete error:', e);
+    console.warn('Suppression IndexedDB échouée:', e);
   }
-  const local = getLocalStorageObservations().filter((item) => item.id !== id);
-  saveLocalStorageObservations(local);
+
+  const current = await getFallbackObservations();
+  const filtered = current.filter((item) => item.id !== id);
+  await saveFallbackObservations(filtered);
 }
 
+// --- Import / Export Handlers ---
+
 export function exportToJSON(observations: Observation[]): void {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(observations, null, 2));
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(observations, null, 2));
   const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `observations_oiseaux_${new Date().toISOString().split('T')[0]}.json`);
+  downloadAnchor.setAttribute('href', dataStr);
+  downloadAnchor.setAttribute('download', `observations_oiseaux_${new Date().toISOString().split('T')[0]}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
@@ -128,7 +237,7 @@ export function exportToCSV(observations: Observation[]): void {
       `"${(obs.location || '').replace(/"/g, '""')}"`,
       obs.count,
       `"${(obs.notes || '').replace(/"/g, '""')}"`,
-      obs.created_at
+      obs.created_at,
     ];
     csvRows.push(row.join(','));
   }
@@ -175,9 +284,19 @@ export async function importFromJSON(jsonText: string): Promise<number> {
   }
 }
 
-// --- Custom Bird Species Persistence ---
+// --- Custom Bird Species High-Capacity Storage ---
 
-function getLocalStorageCustomBirds(): Bird[] {
+async function getFallbackCustomBirds(): Promise<Bird[]> {
+  const opfs = await readOPFSFile('custom_birds.json');
+  if (opfs) {
+    try { return JSON.parse(opfs); } catch {}
+  }
+
+  const cache = await readCacheStorageData(CUSTOM_BIRDS_URI);
+  if (cache) {
+    try { return JSON.parse(cache); } catch {}
+  }
+
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_BIRDS_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -186,11 +305,17 @@ function getLocalStorageCustomBirds(): Bird[] {
   }
 }
 
-function saveLocalStorageCustomBirds(birds: Bird[]): void {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_BIRDS_KEY, JSON.stringify(birds));
-  } catch (e) {
-    console.error('LocalStorage write error for custom birds', e);
+async function saveFallbackCustomBirds(birds: Bird[]): Promise<void> {
+  const json = JSON.stringify(birds);
+  const opfsOk = await saveOPFSFile('custom_birds.json', json);
+  const cacheOk = await saveCacheStorageData(CUSTOM_BIRDS_URI, json);
+
+  if (!opfsOk && !cacheOk) {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_BIRDS_KEY, json);
+    } catch (e) {
+      console.warn('Erreur quota LocalStorage custom birds:', e);
+    }
   }
 }
 
@@ -201,9 +326,9 @@ export async function getCustomBirds(): Promise<Bird[]> {
       return await db.getAll('custom_birds');
     }
   } catch (e) {
-    console.warn('Error reading custom birds from IndexedDB:', e);
+    console.warn('Erreur lecture custom_birds IndexedDB:', e);
   }
-  return getLocalStorageCustomBirds();
+  return getFallbackCustomBirds();
 }
 
 export async function saveCustomBird(bird: Bird): Promise<Bird> {
@@ -213,11 +338,14 @@ export async function saveCustomBird(bird: Bird): Promise<Bird> {
       await db.put('custom_birds', bird);
     }
   } catch (e) {
-    console.warn('IndexedDB error saving custom bird:', e);
+    console.warn('Erreur écriture custom_birds IndexedDB:', e);
   }
-  const local = getLocalStorageCustomBirds().filter((b) => b.id !== bird.id);
-  local.push(bird);
-  saveLocalStorageCustomBirds(local);
+
+  const current = await getFallbackCustomBirds();
+  const filtered = current.filter((b) => b.id !== bird.id);
+  filtered.push(bird);
+  await saveFallbackCustomBirds(filtered);
+
   return bird;
 }
 
@@ -258,3 +386,30 @@ export async function importBirdsFromJSON(jsonText: string): Promise<Bird[]> {
   }
 }
 
+// --- Storage Quota Monitor API ---
+
+export interface StorageEstimate {
+  usageMB: string;
+  quotaGB: string;
+  percentUsed: string;
+}
+
+export async function getStorageEstimate(): Promise<StorageEstimate | null> {
+  if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.estimate) {
+    try {
+      const estimate = await navigator.storage.estimate();
+      const usage = (estimate.usage || 0) / (1024 * 1024);
+      const quota = (estimate.quota || 0) / (1024 * 1024 * 1024);
+      const percent = estimate.quota ? ((estimate.usage || 0) / estimate.quota) * 100 : 0;
+
+      return {
+        usageMB: usage.toFixed(2),
+        quotaGB: quota.toFixed(1),
+        percentUsed: percent.toFixed(2),
+      };
+    } catch (e) {
+      console.warn('Storage estimate indisponible:', e);
+    }
+  }
+  return null;
+}

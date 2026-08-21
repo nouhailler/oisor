@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bird, IdentificationFilters, SizeCategory, BeakType } from '../types/bird';
+import { Bird, IdentificationFilters, SizeCategory, BeakType, REGIONS_FRANCE } from '../types/bird';
 import { BirdImage } from './BirdImage';
 import { Sparkles, RotateCcw, Check, ChevronRight, Ruler, Palette, Compass, MapPin, Eye } from 'lucide-react';
 
@@ -13,7 +13,7 @@ const SIZE_OPTIONS: { value: SizeCategory; label: string; desc: string; icon: st
   { value: 'petit', label: 'Petit', desc: '15-25 cm (Moineau, Chardonneret)', icon: '🐦' },
   { value: 'moyen', label: 'Moyen', desc: '25-45 cm (Merle, Pigeon, Pie)', icon: '🕊️' },
   { value: 'grand', label: 'Grand', desc: '45-70 cm (Canard, Faucon)', icon: '🦅' },
-  { value: 'très-grand', label: 'Très Grand', desc: '> 70 cm (Héron cendré)', icon: '🦩' },
+  { value: 'très-grand', label: 'Très Grand', desc: '> 70 cm (Héron, Aigle, Fou)', icon: '🦩' },
 ];
 
 const BEAK_OPTIONS: { value: BeakType; label: string; desc: string; icon: string }[] = [
@@ -52,6 +52,7 @@ export const IdentificationWizard: React.FC<WizardProps> = ({ birds, onSelectBir
     colors: [],
     beak_type: null,
     habitat: null,
+    region: null,
   });
 
   const [activeStep, setActiveStep] = useState<number>(1);
@@ -71,51 +72,60 @@ export const IdentificationWizard: React.FC<WizardProps> = ({ birds, onSelectBir
       colors: [],
       beak_type: null,
       habitat: null,
+      region: null,
     });
     setActiveStep(1);
   };
 
   // Score computation for bird matches
-  const birdScores = birds.map((bird) => {
-    let maxPossibleScore = 0;
-    let currentScore = 0;
-
-    // Size criteria
-    if (filters.size_category) {
-      maxPossibleScore += 30;
-      if (bird.size_category === filters.size_category) {
-        currentScore += 30;
+  const birdScores = birds
+    .filter((bird) => {
+      // Hard filter if a region is explicitly selected
+      if (filters.region && bird.regions && !bird.regions.includes(filters.region)) {
+        return false;
       }
-    }
+      return true;
+    })
+    .map((bird) => {
+      let maxPossibleScore = 0;
+      let currentScore = 0;
 
-    // Color criteria
-    if (filters.colors.length > 0) {
-      maxPossibleScore += 30;
-      const matchingColors = filters.colors.filter((c) => bird.main_colors.includes(c));
-      const colorRatio = matchingColors.length / filters.colors.length;
-      currentScore += Math.round(colorRatio * 30);
-    }
-
-    // Beak criteria
-    if (filters.beak_type) {
-      maxPossibleScore += 20;
-      if (bird.beak_type === filters.beak_type) {
-        currentScore += 20;
+      // Size criteria
+      if (filters.size_category) {
+        maxPossibleScore += 30;
+        if (bird.size_category === filters.size_category) {
+          currentScore += 30;
+        }
       }
-    }
 
-    // Habitat criteria
-    if (filters.habitat) {
-      maxPossibleScore += 20;
-      if (bird.habitat.includes(filters.habitat)) {
-        currentScore += 20;
+      // Color criteria
+      if (filters.colors.length > 0) {
+        maxPossibleScore += 30;
+        const matchingColors = filters.colors.filter((c) => bird.main_colors.includes(c));
+        const colorRatio = matchingColors.length / filters.colors.length;
+        currentScore += Math.round(colorRatio * 30);
       }
-    }
 
-    const percentage = maxPossibleScore > 0 ? Math.round((currentScore / maxPossibleScore) * 100) : 100;
+      // Beak criteria
+      if (filters.beak_type) {
+        maxPossibleScore += 20;
+        if (bird.beak_type === filters.beak_type) {
+          currentScore += 20;
+        }
+      }
 
-    return { bird, score: currentScore, percentage, maxPossibleScore };
-  });
+      // Habitat criteria
+      if (filters.habitat) {
+        maxPossibleScore += 20;
+        if (bird.habitat.includes(filters.habitat)) {
+          currentScore += 20;
+        }
+      }
+
+      const percentage = maxPossibleScore > 0 ? Math.round((currentScore / maxPossibleScore) * 100) : 100;
+
+      return { bird, score: currentScore, percentage, maxPossibleScore };
+    });
 
   // Filter and sort candidates
   const candidates = birdScores
@@ -123,7 +133,7 @@ export const IdentificationWizard: React.FC<WizardProps> = ({ birds, onSelectBir
     .sort((a, b) => b.percentage - a.percentage);
 
   const hasActiveFilters = Boolean(
-    filters.size_category || filters.colors.length > 0 || filters.beak_type || filters.habitat
+    filters.size_category || filters.colors.length > 0 || filters.beak_type || filters.habitat || filters.region
   );
 
   return (
@@ -131,17 +141,44 @@ export const IdentificationWizard: React.FC<WizardProps> = ({ birds, onSelectBir
       {/* Wizard Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border border-teal-500/20 p-6 sm:p-8 shadow-2xl">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl" />
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Clé de Détermination Visuelle</span>
+        <div className="relative z-10 max-w-3xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Clé de Détermination Visuelle</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Quel est cet oiseau observé ?
+            </h1>
+            <p className="mt-2 text-slate-300 text-sm sm:text-base leading-relaxed">
+              Sélectionnez la taille, les couleurs et les détails observés. Notre algorithme côté client calcule en direct la correspondance avec la faune française.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Quel est cet oiseau observé ?
-          </h1>
-          <p className="mt-2 text-slate-300 text-sm sm:text-base leading-relaxed">
-            Sélectionnez la taille, les couleurs et les détails observés. Notre algorithme côté client calcule en direct la correspondance avec la faune française.
-          </p>
+
+          {/* Optional Region Filter Dropdown inside Wizard Header */}
+          <div className="bg-slate-950/80 p-4 rounded-2xl border border-teal-500/30 shrink-0 w-full md:w-64 space-y-2">
+            <div className="flex items-center space-x-2 text-teal-300 text-xs font-bold">
+              <MapPin className="w-4 h-4 text-teal-400" />
+              <span>Filtrer par région (optionnel) :</span>
+            </div>
+            <select
+              value={filters.region || ''}
+              onChange={(e) => setFilters((prev) => ({ ...prev, region: e.target.value || null }))}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-teal-400"
+            >
+              <option value="">Toutes les régions</option>
+              <option value="Auvergne-Rhône-Alpes">🏔️ Auvergne-Rhône-Alpes</option>
+              <option value="Bretagne">🌊 Bretagne</option>
+              <option value="Île-de-France">🏛️ Île-de-France</option>
+              {REGIONS_FRANCE.filter(
+                (r) => !['Auvergne-Rhône-Alpes', 'Bretagne', 'Île-de-France'].includes(r)
+              ).map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

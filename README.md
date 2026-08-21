@@ -34,7 +34,7 @@
 - Formulaire de saisie d'observation avec :
   - Date, heure, nombre d'individus et notes de terrain.
   - **Géolocalisation GPS automatique** via l'API navigateur `navigator.geolocation`.
-- **Stockage 100% privé et persistant** sur l'appareil via **IndexedDB** (avec secours LocalStorage).
+- **Stockage 100% privé, Haute Capacité et persistant** sur l'appareil via **IndexedDB** couplé à l'**OPFS (Origin Private File System)** et l'**API Web Cache Storage**. Ce mécanisme élimine totalement la contrainte des 5 Mo du `localStorage` et offre plusieurs gigaoctets d'espace local pour stocker observations, coordonnées GPS, photos et enregistrements.
 - Module d'**Exportation** au format **JSON** et **CSV** (Excel).
 - Module d'**Importation** pour restaurer des sauvegardes d'observations.
 
@@ -109,7 +109,7 @@
 - **Bundler :** [Vite 6](https://vitejs.dev/)
 - **Styling :** [Tailwind CSS v4](https://tailwindcss.com/)
 - **Icônes :** [Lucide React](https://lucide.dev/)
-- **Stockage Client :** [IndexedDB (via library idb)](https://github.com/jakearchibald/idb) + LocalStorage
+- **Stockage Client Haute Capacité :** [IndexedDB (via idb)](https://github.com/jakearchibald/idb) + OPFS (Origin Private File System) + Web Cache Storage API (Gigaoctets disponibles sans la limitation de 5 Mo du LocalStorage)
 - **Service Worker & PWA :** Service Worker natif ES6+ & Manifest W3C
 - **Hébergement :** Configuré pour [Netlify](https://www.netlify.com/) (`netlify.toml`)
 

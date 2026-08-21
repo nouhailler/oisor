@@ -38,7 +38,8 @@ const SAMPLE_SPECIES_JSON = [
     description: "Passereau massif au bec triangulaire extrêmement puissant capable d'écraser des noyaux de cerises.",
     diet: "Granivore & graines dures",
     similar_species: ["chardonneret-elegant"],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Erithacus_rubecula_with_cocked_head.jpg/800px-Erithacus_rubecula_with_cocked_head.jpg"
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Erithacus_rubecula_with_cocked_head.jpg/800px-Erithacus_rubecula_with_cocked_head.jpg",
+    regions: ["Île-de-France", "Auvergne-Rhône-Alpes", "Bretagne"]
   }
 ];
 

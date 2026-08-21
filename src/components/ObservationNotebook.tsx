@@ -6,6 +6,8 @@ import {
   exportToJSON,
   exportToCSV,
   importFromJSON,
+  getStorageEstimate,
+  StorageEstimate,
 } from '../services/db';
 import {
   BookText,
@@ -58,6 +60,11 @@ export const ObservationNotebook: React.FC<ObservationNotebookProps> = ({
   const [searchFilter, setSearchFilter] = useState('');
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [storageInfo, setStorageInfo] = useState<StorageEstimate | null>(null);
+
+  React.useEffect(() => {
+    getStorageEstimate().then((info) => setStorageInfo(info));
+  }, [observations]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -194,15 +201,23 @@ export const ObservationNotebook: React.FC<ObservationNotebookProps> = ({
       {/* Header Banner & Stats */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border border-teal-500/20 p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider mb-2">
-            <BookText className="w-3.5 h-3.5" />
-            <span>Stockage 100% Local & Sécurisé</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
+              <BookText className="w-3.5 h-3.5" />
+              <span>IndexedDB & OPFS (Haute Capacité)</span>
+            </div>
+
+            {storageInfo && (
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-950/80 border border-slate-800 text-slate-300 text-xs font-semibold">
+                <span>💾 Utilisation : <strong>{storageInfo.usageMB} Mo</strong> / {storageInfo.quotaGB} Go</span>
+              </span>
+            )}
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Mon Carnet d'Observations
           </h1>
           <p className="text-slate-300 text-sm mt-1 max-w-xl">
-            Toutes vos observations sont conservées directement sur votre appareil (IndexedDB / LocalStorage). Vous pouvez exporter et importer vos données à tout moment.
+            Toutes vos observations sont conservées en sécurité sur votre appareil via <strong>IndexedDB</strong> et l'<strong>OPFS (Origin Private File System)</strong>, sans limitation de 5 Mo.
           </p>
         </div>
 

@@ -5,6 +5,7 @@ import { Navbar } from './components/Navbar';
 import { OfflineBanner } from './components/OfflineBanner';
 import { IdentificationWizard } from './components/IdentificationWizard';
 import { Catalog } from './components/Catalog';
+import { RegionExplorer } from './components/RegionExplorer';
 import { ObservationNotebook } from './components/ObservationNotebook';
 import { SpeciesDetailModal } from './components/SpeciesDetailModal';
 import { ImportModal } from './components/ImportModal';
@@ -13,7 +14,7 @@ import { Feather, ShieldCheck } from 'lucide-react';
 export const App: React.FC = () => {
   const [birds, setBirds] = useState<Bird[]>([]);
   const [observations, setObservations] = useState<Observation[]>([]);
-  const [activeTab, setActiveTab] = useState<'wizard' | 'catalog' | 'notebook'>('wizard');
+  const [activeTab, setActiveTab] = useState<'wizard' | 'catalog' | 'region' | 'notebook'>('wizard');
   const [selectedBird, setSelectedBird] = useState<Bird | null>(null);
   const [preselectedForObs, setPreselectedForObs] = useState<Bird | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -83,6 +84,13 @@ export const App: React.FC = () => {
 
             {activeTab === 'catalog' && (
               <Catalog
+                birds={birds}
+                onSelectBird={(bird) => setSelectedBird(bird)}
+              />
+            )}
+
+            {activeTab === 'region' && (
+              <RegionExplorer
                 birds={birds}
                 onSelectBird={(bird) => setSelectedBird(bird)}
               />

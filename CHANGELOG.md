@@ -5,6 +5,17 @@ Toutes les modifications notables apportées au projet **Oiseaux de France** ser
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Gestion de Version Sémantique](https://semver.org/lang/fr/).
 
+## [1.1.0] - 2026-08-21
+
+### ✨ Ajouté
+- **Guide & Explorateur « Oiseaux par Région » (`RegionExplorer.tsx`) :**
+  - Nouvel onglet de navigation dédié à la faune aviaire par région métropolitaine.
+  - Cartes interactives pour **Auvergne-Rhône-Alpes** (faune alpine et rapaces d'altitude), **Bretagne** (oiseaux marins et côtes armoricaines) et **Île-de-France** (bassin parisien, parcs et forêts).
+  - Filtres régionaux intégrés au Catalogue général et à la Clé de détermination.
+- **Extension de la Base de Données Ornithologique (`birds.json`) :**
+  - Ajout de 23 nouvelles espèces emblématiques (Aigle royal, Gypaète barbu, Tétras lyre, Fou de Bassan, Macareux moine, Faucon pèlerin, Chouette hulotte, Pic vert, Pic épeiche, etc.).
+  - Enrichissement du schéma JSON avec le champ `regions` et documentation dans le gabarit d'importation.
+
 ---
 
 ## [1.0.0] - 2026-08-10
@@ -25,7 +36,8 @@ et ce projet adhère au [Gestion de Version Sémantique](https://semver.org/lang
 - **Carnet d'Observation Personnel (100% Local) :**
   - Formulaire de saisie d'observation (espèce, date, heure, lieu, comptage d'individus, notes).
   - Bouton de **Géolocalisation GPS automatique** via l'API `navigator.geolocation`.
-  - Persistence locale sécurisée via **IndexedDB** (avec secours LocalStorage).
+  - Persistence locale sécurisée et Haute Capacité via **IndexedDB** couplé à l'**OPFS (Origin Private File System)** et l'**API Web Cache Storage**, supprimant la limite de 5 Mo du LocalStorage.
+  - Affichage en temps réel de la consommation du quota de stockage de l'appareil (`navigator.storage.estimate()`).
   - Module d'**Exportation** au format **JSON** et **CSV** (Excel).
   - Module d'**Importation** de sauvegardes JSON.
 - **Menu d'Importation & Gabarits JSON :**

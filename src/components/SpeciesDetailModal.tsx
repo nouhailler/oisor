@@ -163,22 +163,48 @@ export const SpeciesDetailModal: React.FC<SpeciesDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Habitat List */}
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2 text-teal-400 font-semibold text-sm">
-                <MapPin className="w-4 h-4" />
-                <span>Habitats privilégiés</span>
+            {/* Habitat & Regions List */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-teal-400 font-semibold text-sm">
+                  <MapPin className="w-4 h-4" />
+                  <span>Habitats privilégiés</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {bird.habitat.map((h) => (
+                    <span
+                      key={h}
+                      className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-200 text-xs font-semibold border border-slate-700"
+                    >
+                      {h}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {bird.habitat.map((h) => (
-                  <span
-                    key={h}
-                    className="px-3 py-1 rounded-xl bg-slate-800 text-slate-200 text-xs font-semibold border border-slate-700"
-                  >
-                    {h}
-                  </span>
-                ))}
-              </div>
+
+              {bird.regions && bird.regions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-teal-400 font-semibold text-sm">
+                    <Compass className="w-4 h-4" />
+                    <span>Régions d'observation</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {bird.regions.slice(0, 4).map((r) => (
+                      <span
+                        key={r}
+                        className="px-2.5 py-1 rounded-xl bg-teal-950/60 text-teal-300 text-xs font-semibold border border-teal-500/30"
+                      >
+                        {r}
+                      </span>
+                    ))}
+                    {bird.regions.length > 4 && (
+                      <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-400 text-xs font-semibold">
+                        +{bird.regions.length - 4} autres
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Confusions Possibles Section */}

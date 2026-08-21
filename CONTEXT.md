@@ -16,10 +16,11 @@ L'application **Oiseaux de France** a été conçue pour répondre à un besoin 
 - Lors de la première visite avec connexion, l'ensemble des fichiers HTML, JS, CSS, JSON et visuels sont mis en cache.
 - Lors des visites ultérieures, l'application démarre instantanément en mode hors-ligne sans aucune dépendance réseau.
 
-### 💾 3. Modèle de Stockage Persistant (IndexedDB + LocalStorage)
-- Les observations saisies sur le terrain sont stockées dans l'API **IndexedDB** du navigateur via la bibliothèque `idb`.
-- Un mécanisme de secours vers `localStorage` assure la persistance des données y compris dans les environnements de navigation restreints.
-- L'utilisateur possède le contrôle total sur ses données via les fonctions d'exportation (JSON / CSV) et d'importation.
+### 💾 3. Modèle de Stockage Persistant Haute Capacité (IndexedDB + OPFS + Cache Storage)
+- Les observations saisies sur le terrain sont stockées en priorité dans l'API **IndexedDB** du navigateur via la bibliothèque `idb`.
+- En cas d'indisponibilité ou d'erreur sur IndexedDB (modes de navigation ultra-stricts), l'application bascule automatiquement sur un moteur de secours à haute capacité s'appuyant sur l'**OPFS (Origin Private File System)** via `navigator.storage.getDirectory()` et l'**API Web Cache Storage**.
+- Ce choix technique écarte complètement la limite de 5 Mo imposée par `localStorage` et permet de stocker sans risque des milliers d'observations, données GPS précises, photos et enregistrements sonores (quota d'origine de plusieurs Gigaoctets).
+- L'utilisateur possède un suivi en temps réel de l'espace occupé via `navigator.storage.estimate()` ainsi qu'un contrôle total via les fonctions d'exportation (JSON / CSV) et d'importation.
 
 ### 🎨 4. Design & Ergonomie Modernes
 - Développement avec **Tailwind CSS v4** et **React 18**.
