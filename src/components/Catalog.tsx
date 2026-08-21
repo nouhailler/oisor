@@ -13,6 +13,7 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedHabitat, setSelectedHabitat] = useState<string>('all');
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'alpha' | 'alpha-reverse' | 'family'>('alpha');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -40,14 +41,16 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
           bird.name_common.toLowerCase().includes(query) ||
           bird.name_latin.toLowerCase().includes(query) ||
           bird.family.toLowerCase().includes(query) ||
+          (bird.category && bird.category.toLowerCase().includes(query)) ||
           bird.description.toLowerCase().includes(query);
 
         const matchesHabitat = selectedHabitat === 'all' || bird.habitat.includes(selectedHabitat);
         const matchesFamily = selectedFamily === 'all' || bird.family === selectedFamily;
+        const matchesCategory = selectedCategory === 'all' || bird.category === selectedCategory;
         const matchesRegion =
           selectedRegion === 'all' || (bird.regions && bird.regions.includes(selectedRegion));
 
-        return matchesSearch && matchesHabitat && matchesFamily && matchesRegion;
+        return matchesSearch && matchesHabitat && matchesFamily && matchesCategory && matchesRegion;
       })
       .sort((a, b) => {
         if (sortBy === 'alpha') return a.name_common.localeCompare(b.name_common, 'fr');
@@ -55,7 +58,7 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
         if (sortBy === 'family') return a.family.localeCompare(b.family, 'fr');
         return 0;
       });
-  }, [birds, searchQuery, selectedHabitat, selectedFamily, selectedRegion, sortBy]);
+  }, [birds, searchQuery, selectedHabitat, selectedFamily, selectedCategory, selectedRegion, sortBy]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -152,6 +155,23 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
             ))}
           </select>
 
+          {/* Category Select */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-semibold text-amber-300 focus:outline-none focus:border-teal-500"
+          >
+            <option value="all">🦅 Tous les groupes (Rapaces, Passereaux...)</option>
+            <option value="Rapaces">🦅 Rapaces</option>
+            <option value="Hirondelles et martinets">🕊️ Hirondelles & Martinets</option>
+            <option value="Passereaux">🐦 Passereaux</option>
+            <option value="Oiseaux d'eau">🦆 Oiseaux d'eau</option>
+            <option value="Oiseaux marins">🌊 Oiseaux marins</option>
+            <option value="Échassiers">🦩 Échassiers</option>
+            <option value="Oiseaux de montagne">🏔️ Oiseaux de montagne</option>
+            <option value="Pics & Corvidés">🪵 Pics & Corvidés</option>
+          </select>
+
           {/* Habitat Select */}
           <select
             value={selectedHabitat}
@@ -172,7 +192,7 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
             onChange={(e) => setSelectedFamily(e.target.value)}
             className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-teal-500"
           >
-            <option value="all">Toutes les familles</option>
+            <option value="all">Toutes les familles taxonomiques</option>
             {allFamilies.map((f) => (
               <option key={f} value={f}>
                 {f}
@@ -180,11 +200,12 @@ export const Catalog: React.FC<CatalogProps> = ({ birds, onSelectBird, onSelectR
             ))}
           </select>
 
-          {(selectedHabitat !== 'all' || selectedFamily !== 'all' || selectedRegion !== 'all' || searchQuery) && (
+          {(selectedHabitat !== 'all' || selectedFamily !== 'all' || selectedCategory !== 'all' || selectedRegion !== 'all' || searchQuery) && (
             <button
               onClick={() => {
                 setSelectedHabitat('all');
                 setSelectedFamily('all');
+                setSelectedCategory('all');
                 setSelectedRegion('all');
                 setSearchQuery('');
               }}

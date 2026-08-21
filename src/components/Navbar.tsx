@@ -1,10 +1,10 @@
 import React from 'react';
-import { Feather, Compass, BookOpen, BookText, FileJson, Wifi, WifiOff, CheckCircle2, Download, MapPin } from 'lucide-react';
+import { Feather, Compass, BookOpen, BookText, FileJson, Wifi, WifiOff, CheckCircle2, Download, MapPin, Layers } from 'lucide-react';
 import { useOnlineStatus, usePWAInstallPrompt } from '../services/pwaService';
 
 interface NavbarProps {
-  activeTab: 'wizard' | 'catalog' | 'region' | 'notebook';
-  setActiveTab: (tab: 'wizard' | 'catalog' | 'region' | 'notebook') => void;
+  activeTab: 'wizard' | 'catalog' | 'region' | 'family' | 'notebook';
+  setActiveTab: (tab: 'wizard' | 'catalog' | 'region' | 'family' | 'notebook') => void;
   observationCount: number;
   onOpenImportModal: () => void;
 }
@@ -36,19 +36,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
           <nav className="hidden md:flex items-center space-x-1 bg-slate-950/60 p-1.5 rounded-2xl border border-slate-800/80">
             <button
               onClick={() => setActiveTab('wizard')}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'wizard'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
               }`}
             >
               <Compass className="w-4 h-4" />
-              <span>Clé d'Identification</span>
+              <span>Clé</span>
             </button>
 
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'catalog'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -59,8 +59,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
             </button>
 
             <button
+              onClick={() => setActiveTab('family')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+                activeTab === 'family'
+                  ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Par Famille</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('region')}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'region'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -72,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
 
             <button
               onClick={() => setActiveTab('notebook')}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl font-medium text-xs lg:text-sm transition-all duration-200 ${
                 activeTab === 'notebook'
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -91,11 +103,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
 
             <button
               onClick={onOpenImportModal}
-              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-teal-300 hover:text-white bg-teal-950/60 hover:bg-teal-900/60 border border-teal-500/30 transition-all"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-teal-300 hover:text-white bg-teal-950/60 hover:bg-teal-900/60 border border-teal-500/30 transition-all"
               title="Menu d'importation et documentation du Gabarit JSON"
             >
               <FileJson className="w-4 h-4 text-teal-400" />
-              <span className="hidden xl:inline">Import JSON</span>
+              <span className="hidden xl:inline">Import</span>
             </button>
           </nav>
 
@@ -136,60 +148,62 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, observa
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-1.5 flex justify-around items-center">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/80 px-1 py-1.5 flex justify-around items-center">
         <button
           onClick={() => setActiveTab('wizard')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
+          className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all ${
             activeTab === 'wizard' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
-          <Compass className="w-5 h-5 mb-0.5" />
-          <span>Identification</span>
+          <Compass className="w-4 h-4 mb-0.5" />
+          <span>Clé</span>
         </button>
 
         <button
           onClick={() => setActiveTab('catalog')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
+          className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all ${
             activeTab === 'catalog' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
-          <BookOpen className="w-5 h-5 mb-0.5" />
+          <BookOpen className="w-4 h-4 mb-0.5" />
           <span>Catalogue</span>
         </button>
 
         <button
+          onClick={() => setActiveTab('family')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all ${
+            activeTab === 'family' ? 'text-teal-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Layers className="w-4 h-4 mb-0.5" />
+          <span>Familles</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('region')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all ${
+          className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all ${
             activeTab === 'region' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
-          <MapPin className="w-5 h-5 mb-0.5" />
-          <span>Par Région</span>
+          <MapPin className="w-4 h-4 mb-0.5" />
+          <span>Régions</span>
         </button>
 
         <button
           onClick={() => setActiveTab('notebook')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-xs transition-all relative ${
+          className={`flex flex-col items-center py-1 px-2 rounded-xl text-[11px] transition-all relative ${
             activeTab === 'notebook' ? 'text-teal-400 font-bold' : 'text-slate-400'
           }`}
         >
           <div className="relative">
-            <BookText className="w-5 h-5 mb-0.5" />
+            <BookText className="w-4 h-4 mb-0.5" />
             {observationCount > 0 && (
-              <span className="absolute -top-1 -right-2 px-1.5 py-0.2 text-[10px] rounded-full bg-teal-500 text-slate-950 font-extrabold">
+              <span className="absolute -top-1 -right-2 px-1.5 py-0.2 text-[9px] rounded-full bg-teal-500 text-slate-950 font-extrabold">
                 {observationCount}
               </span>
             )}
           </div>
           <span>Carnet</span>
-        </button>
-
-        <button
-          onClick={onOpenImportModal}
-          className="flex flex-col items-center py-1 px-2.5 rounded-xl text-xs text-teal-400 font-semibold"
-        >
-          <FileJson className="w-5 h-5 mb-0.5" />
-          <span>Import</span>
         </button>
       </div>
     </header>

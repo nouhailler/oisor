@@ -8,13 +8,13 @@ et ce projet adhère au [Gestion de Version Sémantique](https://semver.org/lang
 ## [1.1.0] - 2026-08-21
 
 ### ✨ Ajouté
+- **Guide & Explorateur « Oiseaux par Famille » (`FamilyExplorer.tsx`) :**
+  - Nouvel onglet de navigation dédié à la classification des oiseaux par grands groupes : **Rapaces**, **Hirondelles et martinets**, **Passereaux**, **Oiseaux d'eau**, **Oiseaux marins**, **Échassiers**, **Oiseaux de montagne**, **Pics & Corvidés**.
+  - Filtre dynamique par groupe dans le Catalogue général.
 - **Guide & Explorateur « Oiseaux par Région » (`RegionExplorer.tsx`) :**
-  - Nouvel onglet de navigation dédié à la faune aviaire par région métropolitaine.
-  - Cartes interactives pour **Auvergne-Rhône-Alpes** (faune alpine et rapaces d'altitude), **Bretagne** (oiseaux marins et côtes armoricaines) et **Île-de-France** (bassin parisien, parcs et forêts).
-  - Filtres régionaux intégrés au Catalogue général et à la Clé de détermination.
-- **Extension de la Base de Données Ornithologique (`birds.json`) :**
-  - Ajout de 23 nouvelles espèces emblématiques (Aigle royal, Gypaète barbu, Tétras lyre, Fou de Bassan, Macareux moine, Faucon pèlerin, Chouette hulotte, Pic vert, Pic épeiche, etc.).
-  - Enrichissement du schéma JSON avec le champ `regions` et documentation dans le gabarit d'importation.
+  - Nouvel onglet de navigation dédié à la faune aviaire par région métropolitaine (Auvergne-Rhône-Alpes, Bretagne, Île-de-France...).
+- **Extension Majeure de la Base de Données Ornithologique (`birds.json`) :**
+  - Base enrichie à **44 espèces** emblématiques avec l'ajout de l'Aigle de Bonelli, Balbuzard pêcheur, Buse variable, Milan noir, Hirondelle de fenêtre, Hirondelle de rivage, Martinet à ventre blanc, Grive musicienne, Cygne tuberculé, Foulque macroule, Grèbe huppé, Grande Aigrette, Puffin des Baléares, Cigogne blanche, Cigogne noire, Spatule blanche, Ibis falcinelle, etc.
 
 ---
 

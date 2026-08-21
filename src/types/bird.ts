@@ -20,11 +20,25 @@ export const REGIONS_FRANCE = [
 
 export type RegionName = (typeof REGIONS_FRANCE)[number];
 
+export const BIRD_CATEGORIES = [
+  'Rapaces',
+  'Hirondelles et martinets',
+  'Passereaux',
+  'Oiseaux d\'eau',
+  'Oiseaux marins',
+  'Échassiers',
+  'Oiseaux de montagne',
+  'Pics & Corvidés',
+] as const;
+
+export type BirdCategory = (typeof BIRD_CATEGORIES)[number];
+
 export interface Bird {
   id: string;
   name_common: string;
   name_latin: string;
   family: string;
+  category?: string;
   habitat: string[];
   size_category: SizeCategory;
   size_cm: string;
@@ -45,6 +59,7 @@ export interface IdentificationFilters {
   beak_type: BeakType | null;
   habitat: string | null;
   region?: string | null;
+  category?: string | null;
 }
 
 export interface Observation {
