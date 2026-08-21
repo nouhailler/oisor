@@ -10,7 +10,9 @@ import { FamilyExplorer } from './components/FamilyExplorer';
 import { ObservationNotebook } from './components/ObservationNotebook';
 import { SpeciesDetailModal } from './components/SpeciesDetailModal';
 import { ImportModal } from './components/ImportModal';
-import { Feather, ShieldCheck } from 'lucide-react';
+import { UpdateModal } from './components/UpdateModal';
+import { Feather, ShieldCheck, RefreshCw } from 'lucide-react';
+import { APP_VERSION, BUILD_DATE } from './version';
 
 export const App: React.FC = () => {
   const [birds, setBirds] = useState<Bird[]>([]);
@@ -19,6 +21,7 @@ export const App: React.FC = () => {
   const [selectedBird, setSelectedBird] = useState<Bird | null>(null);
   const [preselectedForObs, setPreselectedForObs] = useState<Bird | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Load built-in birds dataset + custom imported species
@@ -143,6 +146,12 @@ export const App: React.FC = () => {
         }}
       />
 
+      {/* System Update & Version Modal */}
+      <UpdateModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+      />
+
       {/* Footer */}
       <footer className="bg-slate-900/60 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -152,7 +161,16 @@ export const App: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="flex items-center space-x-1">
+            <button
+              onClick={() => setIsUpdateModalOpen(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-teal-300 font-semibold border border-slate-700 transition-all text-[11px]"
+              title="Vérifier la version et les mises à jour"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-teal-400" />
+              <span>v{APP_VERSION} ({BUILD_DATE})</span>
+            </button>
+
+            <span className="hidden sm:flex items-center space-x-1">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>100% Client-side & Données Locales</span>
             </span>

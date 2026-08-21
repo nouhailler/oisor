@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oiseaux-de-france-v1';
+const CACHE_NAME = 'oiseaux-de-france-v1.1.0';
 
 const STATIC_ASSETS = [
   '/',

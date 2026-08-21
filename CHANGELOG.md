@@ -8,13 +8,19 @@ et ce projet adhère au [Gestion de Version Sémantique](https://semver.org/lang
 ## [1.1.0] - 2026-08-21
 
 ### ✨ Ajouté
+- **Système de Mise à Jour Automatique & Contrôle de Version (`usePWAUpdate`, `UpdateModal.tsx`) :**
+  - Bouton **« Vérifier s'il y a une mise à jour »** vérifiant le Service Worker et l'inventaire réseau en direct.
+  - Bouton **« Forcer la mise à jour maintenant »** purgeant les caches et forçant le rechargement immédiat.
+  - Affichage permanent de la **Version Courante (`v1.1.0`)**, de la **Date de Déploiement/Mise à jour (`21 août 2026 à 18:20`)** et du timestamp de dernière vérification réseau.
+- **Menu Hamburger Global & Modal (`HamburgerMenu.tsx`) :**
+  - Menu récapitulatif par catégorie des 4 grands thèmes de l'application avec jauge de stockage et contrôles système.
 - **Guide & Explorateur « Oiseaux par Famille » (`FamilyExplorer.tsx`) :**
   - Nouvel onglet de navigation dédié à la classification des oiseaux par grands groupes : **Rapaces**, **Hirondelles et martinets**, **Passereaux**, **Oiseaux d'eau**, **Oiseaux marins**, **Échassiers**, **Oiseaux de montagne**, **Pics & Corvidés**.
   - Filtre dynamique par groupe dans le Catalogue général.
 - **Guide & Explorateur « Oiseaux par Région » (`RegionExplorer.tsx`) :**
   - Nouvel onglet de navigation dédié à la faune aviaire par région métropolitaine (Auvergne-Rhône-Alpes, Bretagne, Île-de-France...).
 - **Extension Majeure de la Base de Données Ornithologique (`birds.json`) :**
-  - Base enrichie à **44 espèces** emblématiques avec l'ajout de l'Aigle de Bonelli, Balbuzard pêcheur, Buse variable, Milan noir, Hirondelle de fenêtre, Hirondelle de rivage, Martinet à ventre blanc, Grive musicienne, Cygne tuberculé, Foulque macroule, Grèbe huppé, Grande Aigrette, Puffin des Baléares, Cigogne blanche, Cigogne noire, Spatule blanche, Ibis falcinelle, etc.
+  - Base enrichie à **44 espèces** emblématiques.
 
 ---
 

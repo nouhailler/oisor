@@ -18,8 +18,13 @@ import {
   ChevronRight,
   HardDrive,
   CheckCircle2,
+  RefreshCw,
+  Zap,
+  Calendar,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
-import { useOnlineStatus, usePWAInstallPrompt } from '../services/pwaService';
+import { useOnlineStatus, usePWAInstallPrompt, usePWAUpdate } from '../services/pwaService';
 
 interface HamburgerMenuProps {
   isOpen: boolean;
@@ -28,6 +33,7 @@ interface HamburgerMenuProps {
   setActiveTab: (tab: 'wizard' | 'catalog' | 'region' | 'family' | 'notebook') => void;
   observationCount: number;
   onOpenImportModal: () => void;
+  onOpenUpdateModal?: () => void;
 }
 
 export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
@@ -40,6 +46,17 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
 }) => {
   const isOnline = useOnlineStatus();
   const { isInstallable, isInstalled, triggerInstall } = usePWAInstallPrompt();
+  const {
+    currentVersion,
+    lastUpdateDate,
+    lastCheckDate,
+    updateAvailable,
+    checking,
+    statusMessage,
+    checkUpdate,
+    forceUpdate,
+  } = usePWAUpdate();
+
   const [storageUsage, setStorageUsage] = useState<{ usedMb: string; quotaMb: string } | null>(null);
 
   // Fetch local storage estimation
@@ -79,11 +96,16 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <Feather className="w-6 h-6 stroke-[2.5]" />
               </div>
               <div>
-                <h2 className="font-extrabold text-lg bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                  Oiseaux de France
-                </h2>
+                <div className="flex items-center space-x-2">
+                  <h2 className="font-extrabold text-lg bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                    Oiseaux de France
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-teal-300 text-[10px] font-mono font-bold border border-slate-700">
+                    {currentVersion}
+                  </span>
+                </div>
                 <span className="block text-[10px] text-teal-400 font-semibold uppercase tracking-wider">
-                  Menu & Guide des Fonctionnalités
+                  Menu & Gestion des Mises à Jour
                 </span>
               </div>
             </div>
@@ -255,30 +277,83 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               </div>
             </div>
 
-            {/* Category 4: Outils, Offline & Import */}
+            {/* Category 4: Outils & Mises à Jour System */}
             <div className="space-y-3 pt-2 border-t border-slate-800/60">
               <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-teal-400">
-                <Database className="w-4 h-4 text-teal-400" />
-                <span>4. Outils & Mode Hors-Ligne</span>
+                <RefreshCw className="w-4 h-4 text-teal-400" />
+                <span>4. Gestion des Mises à Jour & Système</span>
               </div>
 
-              <div className="grid grid-cols-1 gap-2">
-                <div
-                  onClick={() => {
-                    onClose();
-                    onOpenImportModal();
-                  }}
-                  className="group p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-teal-500/50 flex items-center justify-between cursor-pointer transition-all"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FileJson className="w-4 h-4 text-teal-400" />
-                    <div>
-                      <h4 className="font-bold text-xs text-white group-hover:text-teal-300">Importation & Gabarit JSON</h4>
-                      <p className="text-[11px] text-slate-400">Import de sauvegardes & espèces personnalisées</p>
-                    </div>
+              {/* Update Card Container */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-xs text-white">Version actuelle :</span>
+                    <span className="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-xs font-mono font-bold border border-teal-500/30">
+                      {currentVersion}
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400" />
+
+                  {updateAvailable && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 animate-pulse">
+                      MAJ Prête
+                    </span>
+                  )}
                 </div>
+
+                <div className="text-[11px] text-slate-300 space-y-1 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                  <p className="flex items-center space-x-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span><strong>Dernière version :</strong> {lastUpdateDate}</span>
+                  </p>
+                  <p className="flex items-center space-x-1.5">
+                    <Clock className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span><strong>Dernière vérification :</strong> {lastCheckDate || 'Jamais vérifié'}</span>
+                  </p>
+                </div>
+
+                {statusMessage && (
+                  <div className="text-[11px] font-semibold text-teal-300 bg-slate-900/80 p-2 rounded-lg border border-teal-500/20">
+                    {statusMessage}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    onClick={checkUpdate}
+                    disabled={checking}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-all disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${checking ? 'animate-spin' : ''}`} />
+                    <span>{checking ? 'Recherche...' : 'Vérifier'}</span>
+                  </button>
+
+                  <button
+                    onClick={forceUpdate}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-400 text-slate-950 font-extrabold text-xs hover:from-teal-400 hover:to-emerald-300 transition-all shadow-md"
+                  >
+                    <Zap className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>Forcer MAJ</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* JSON Import button */}
+              <div
+                onClick={() => {
+                  onClose();
+                  onOpenImportModal();
+                }}
+                className="group p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-teal-500/50 flex items-center justify-between cursor-pointer transition-all"
+              >
+                <div className="flex items-center space-x-3">
+                  <FileJson className="w-4 h-4 text-teal-400" />
+                  <div>
+                    <h4 className="font-bold text-xs text-white group-hover:text-teal-300">Importation & Gabarit JSON</h4>
+                    <p className="text-[11px] text-slate-400">Import de sauvegardes & espèces personnalisées</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400" />
               </div>
             </div>
 
